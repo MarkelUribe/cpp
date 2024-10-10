@@ -14,3 +14,5 @@ $(NAME): $(SRC)
 
 clean:
 	$(RM) $(NAME)
+
+re: clean all
