@@ -5,6 +5,7 @@
 #include <iostream>
 #include <iomanip>
 #include <limits>
+#include <cstdlib>
 
 class Contact {
 
@@ -18,6 +19,7 @@ private:
 public:
 	Contact(void);
 	~Contact(void);
+	void	set_contact(void);
 };
 
 #endif

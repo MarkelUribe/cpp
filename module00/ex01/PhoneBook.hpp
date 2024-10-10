@@ -5,8 +5,10 @@
 
 class PhoneBook {
 public:
-PhoneBook();
-~PhoneBook();
+	PhoneBook();
+	~PhoneBook();
+	void	add();
+	void	search();
 
 private:
 	Contact	contacts[8];
