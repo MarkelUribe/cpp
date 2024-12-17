@@ -12,3 +12,23 @@ void	Contact::set_contact(void) {
 }
 
 Contact::~Contact(void){}
+
+std::string	Contact::get_first_name(void){
+	return (first_name);
+}
+
+std::string	Contact::get_last_name(void){
+	return (last_name);
+}
+
+std::string	Contact::get_nickname(void){
+	return (nickname);
+}
+
+std::string	Contact::get_phone(void){
+	return (phone);
+}
+
+std::string	Contact::get_secret(void){
+	return (secret);
+}

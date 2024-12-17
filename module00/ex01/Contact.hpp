@@ -19,7 +19,12 @@ private:
 public:
 	Contact(void);
 	~Contact(void);
-	void	set_contact(void);
+	void		set_contact(void);
+	std::string	get_first_name(void);
+	std::string	get_last_name(void);
+	std::string	get_nickname(void);
+	std::string	get_phone(void);
+	std::string	get_secret(void);
 };
 
 #endif
