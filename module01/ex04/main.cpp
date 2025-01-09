@@ -28,9 +28,10 @@ int main(int argc, char** argv) {
 	size_t	found = 0;
 	s1 = argv[2];
 	s2 = argv[3];
-	while ((found = text.find(s1, found + 1)) != std::string::npos) {
+	while ((found = text.find(s1, found)) != std::string::npos) {
 		text.erase(found, s1.length());
 		text.insert(found, s2);
+		found += s2.length();
 	}
 	std::string	newFileName = fileName;
 	newFileName += ".replace";
