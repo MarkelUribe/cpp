@@ -3,7 +3,7 @@
 
 int main()
 {
-	int	amount = 20;
+	int	amount = 6;
 	const AAnimal* bag[amount];
 
 	for (int i = 0; i < amount; i++) {
