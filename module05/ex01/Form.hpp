@@ -4,15 +4,15 @@
 #include <iostream>
 #include <stdexcept>
 
-#include "Bureaucrat.hpp"
+class Bureaucrat;
 
 class Form
 {
 private:
 	const std::string	name;
 	bool				isSigned;
-	const int		signGrade;
-	const int		executeGrade;
+	const unsigned int			signGrade;
+	const unsigned int			executeGrade;
 
 public:
 	Form();
@@ -25,9 +25,6 @@ public:
 	bool		getSigned(void) const;
 	int			getSignGrade(void) const;
 	int			getExecuteGrade(void) const;
-
-	void		incrementGrade(void);
-	void		decrementGrade(void);
 
 	void		beSigned(const Bureaucrat &bureaucrat);
 
@@ -46,6 +43,6 @@ public:
 
 };
 
-std::ostream	&operator<<(std::ostream &_ostream, const Form &model);
+std::ostream	&operator<<(std::ostream &stream, const Form &model);
 
 #endif

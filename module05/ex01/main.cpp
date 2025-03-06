@@ -1,29 +1,26 @@
-#include <iomanip>
-#include "Bureaucrat.hpp"
+/* ************************************************************************** */
 
-#define HRED	"\033[91m"
-#define HBLU	"\033[94m"
-#define HGRE	"\033[92m"
-#define HMAG	"\033[95m"
-#define RST		"\033[0m"
+#include "Bureaucrat.hpp"
+#include "Form.hpp"
 
 int main()
 {
-	Bureaucrat jose("jose", 99);
-	std::cout << HGRE << jose << RST << std::endl;
-	Bureaucrat paco("paco", 20);
-	Bureaucrat tulio;
-
-	try
-	{
-		paco = Bureaucrat("paco", 500);
-		Bureaucrat jaime("paco", 0);
-	}
-	catch(const std::exception& e)
-	{
-		std::cerr << HRED << e.what() << RST << std::endl;
-	}
-	std::cout << HBLU << paco << RST << std::endl;
-	std::cout << HMAG << tulio << RST << std::endl;
-	return (0);
+    Bureaucrat  sebas("sebas", 44);
+    Bureaucrat  paco("sebas", 70);
+    Form        a32("a32", 60, 15);
+    std::cout << sebas << std::endl;
+    std::cout << paco << std::endl;
+    std::cout << a32 << std::endl;
+    try
+    {
+        Form    a34("a34", 75, 25);
+        a32.beSigned(paco);
+        a34.beSigned(paco);
+    }
+    catch(const std::exception& e)
+    {
+        std::cerr << e.what() << std::endl;
+    }
+    sebas.signForm(a32);
+    return (0);
 };

@@ -10,8 +10,8 @@ Bureaucrat::Bureaucrat(std::string name, unsigned int grade) : name(name), grade
 	this->grade = grade;
 };
 
-Bureaucrat::Bureaucrat(const Bureaucrat &copy) {
-	*this = copy;
+Bureaucrat::Bureaucrat(const Bureaucrat &copy) : name(copy.name) {
+	grade = copy.grade;
 }
 
 Bureaucrat& Bureaucrat::operator=(const Bureaucrat &other) {
@@ -44,4 +44,16 @@ void	Bureaucrat::decrementGrade(void) {
 std::ostream	&operator<<(std::ostream &ostream, const Bureaucrat &model) {
 	ostream << model.getName() << ", bureaucrat grade " << model.getGrade();
 	return(ostream);
+}
+
+void	Bureaucrat::signForm(Form &form) const {
+	try {
+		form.beSigned(*this);
+		std::cout << this->getName() << " signed " << form.getName() << std::endl;
+	}
+	catch (const std::exception &e) {
+		std::cout << this->getName() << " can't sign form " << form.getName(); 
+		std::cout << " because it's beyond it's jurisdiction (rank difference = ";
+		std::cout << this->getGrade() - form.getSignGrade() << ")" << std::endl;
+	}
 }

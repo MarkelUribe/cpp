@@ -10,8 +10,8 @@ Bureaucrat::Bureaucrat(std::string name, unsigned int grade) : name(name), grade
 	this->grade = grade;
 };
 
-Bureaucrat::Bureaucrat(const Bureaucrat &copy) {
-	*this = copy;
+Bureaucrat::Bureaucrat(const Bureaucrat &copy) : name(copy.name){
+	grade = copy.grade;
 }
 
 Bureaucrat& Bureaucrat::operator=(const Bureaucrat &other) {
