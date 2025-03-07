@@ -1,51 +1,51 @@
-#include "Form.hpp"
+#include "AForm.hpp"
 #include "Bureaucrat.hpp"
 
-Form::Form(): name("Form"), signGrade(150), executeGrade(1)
+AForm::AForm(): name("AForm"), signGrade(150), executeGrade(1)
 {
 	isSigned = false;
 }
 
-Form::Form(std::string name, int sign_grade, int execute_grade)
+AForm::AForm(std::string name, int sign_grade, int execute_grade)
 	: name(name), signGrade(sign_grade), executeGrade(execute_grade)
 {
 	if (sign_grade < 1)
-		throw Form::GradeTooLowException();
+		throw AForm::GradeTooLowException();
 	if (sign_grade > 150)
-		throw Form::GradeTooHighException();
+		throw AForm::GradeTooHighException();
 	if (execute_grade < 1)
-		throw Form::GradeTooLowException();
+		throw AForm::GradeTooLowException();
 	if (execute_grade > 150)
-		throw Form::GradeTooHighException();
+		throw AForm::GradeTooHighException();
 	isSigned = false;
 }
 
-Form::Form(const Form &copy)
+AForm::AForm(const AForm &copy)
 	: name(copy.name), isSigned(false),
 	signGrade(copy.signGrade),
 	executeGrade(copy.executeGrade) {}
 
-Form& Form::operator=(const Form &other) {
+AForm& AForm::operator=(const AForm &other) {
 	isSigned = other.isSigned;
 	return (*this);
 }
 
-Form::~Form() {}
+AForm::~AForm() {}
 
-std::string	Form::getName(void) const {
+std::string	AForm::getName(void) const {
 	return name;
 }
-bool	Form::getSigned(void) const {
+bool	AForm::getSigned(void) const {
 	return isSigned;
 }
-int	Form::getSignGrade(void) const {
+unsigned int	AForm::getSignGrade(void) const {
 	return signGrade;
 }
-int	Form::getExecuteGrade(void) const {
+unsigned int	AForm::getExecuteGrade(void) const {
 	return executeGrade;
 }
 
-std::ostream	&operator<<(std::ostream &stream, const Form &model) {
+std::ostream	&operator<<(std::ostream &stream, const AForm &model) {
 	if (model.getSigned())
 		stream << "Form: " << model.getName() << " is signed ";
 	else
@@ -55,9 +55,9 @@ std::ostream	&operator<<(std::ostream &stream, const Form &model) {
 	return (stream);
 }
 
-void	Form::beSigned(const Bureaucrat &bureaucrat) {
+void	AForm::beSigned(const Bureaucrat &bureaucrat) {
 	std::cout << bureaucrat.getGrade() << this->signGrade << std::endl;
 	if (bureaucrat.getGrade() > this->signGrade)
-		throw Form::GradeTooLowException();
+		throw AForm::GradeTooLowException();
 	isSigned = true;
 }

@@ -6,6 +6,8 @@
 #include <iostream>
 #include <fstream>
 
+#include "Bureaucrat.hpp"
+
 class Bureaucrat;
 
 class AForm
@@ -24,10 +26,10 @@ public:
 	virtual 
 	~AForm();
 
-	std::string	getName(void) const;
-	bool		getSigned(void) const;
-	int			getSignGrade(void) const;
-	int			getExecuteGrade(void) const;
+	std::string		getName(void) const;
+	bool			getSigned(void) const;
+	unsigned int	getSignGrade(void) const;
+	unsigned int	getExecuteGrade(void) const;
 
 	void		beSigned(const Bureaucrat &bureaucrat);
 
@@ -45,7 +47,12 @@ public:
 				return "Grade too low";
 			}
 	};
-
+	class NotSignedException : public std::exception {
+		public:
+			const char *what() const throw() {
+				return ("Form not signed");
+			}
+	};
 };
 
 std::ostream	&operator<<(std::ostream &stream, const AForm &model);

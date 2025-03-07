@@ -1,24 +1,50 @@
 #include "Bureaucrat.hpp"
-#include "Form.hpp"
+#include "AForm.hpp"
+#include "ShrubberyCreationForm.hpp"
+#include "RobotomyRequestForm.hpp"
+#include "PresidentialPardonForm.hpp"
 
-int main()
+int main(void)
 {
-    Bureaucrat  sebas("sebas", 44);
-    Bureaucrat  paco("sebas", 70);
-    Form        a32("a32", 60, 15);
-    std::cout << sebas << std::endl;
-    std::cout << paco << std::endl;
-    std::cout << a32 << std::endl;
-    try
-    {
-        Form    a34("a34", 75, 25);
-        a32.beSigned(paco);
-        a34.beSigned(paco);
-    }
-    catch(const std::exception& e)
-    {
-        std::cerr << e.what() << std::endl;
-    }
-    sebas.signForm(a32);
-    return (0);
-};
+	try {
+		Bureaucrat	test("test", 50);
+		Bureaucrat	john("John Doe", 150);
+		Bureaucrat	jane("Jane Doe", 1);
+		AForm	*shrubbery = new ShrubberyCreationForm("shrubbery");
+		AForm	*robotomy = new RobotomyRequestForm("robotomy");
+		AForm	*presidential = new PresidentialPardonForm("presidential");
+
+		std::cout << "--- Example of ShrubberyCreationForm ---" << std::endl;
+		jane.signForm(*shrubbery);
+		jane.executeForm(*shrubbery);
+		std::cout << "--- Example of RobotomyRequestForm ---" << std::endl;
+		jane.signForm(*robotomy);
+		jane.executeForm(*robotomy);
+		std::cout << "--- Example of PresidentialPardonForm ---" << std::endl;
+		jane.signForm(*presidential);
+		jane.executeForm(*presidential);
+		std::cout << "----- General tests -----" << std::endl;
+		std::cout << test << std::endl;
+		test.decrementGrade();
+		std::cout << test << std::endl;
+		test.incrementGrade();
+		std::cout << test << std::endl;
+		test.incrementGrade();
+		std::cout << test << std::endl;
+		std::cout << "----- Too low exceptions -----" << std::endl;
+		std::cout << john << std::endl;
+		john.decrementGrade();
+		std::cout << john << std::endl;
+		std::cout << "----- Too high exceptions -----" << std::endl;
+		std::cout << jane << std::endl;
+		jane.incrementGrade();
+		std::cout << jane << std::endl;
+		delete shrubbery;
+		delete robotomy;
+		delete presidential;
+	}
+	catch (std::exception &_exception) {
+		std::cout << _exception.what() << std::endl;
+	}
+	return (0);
+}
