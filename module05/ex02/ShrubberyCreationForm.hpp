@@ -6,10 +6,10 @@
 
 #include "AForm.hpp"
 
-class ShrubberyCreationForm : AForm
+class ShrubberyCreationForm : public AForm
 {
 private:
-	const std::string	target;
+	std::string	target;
 
 public:
 	ShrubberyCreationForm();
@@ -18,25 +18,9 @@ public:
 	ShrubberyCreationForm &operator= (const ShrubberyCreationForm &other);
 	virtual ~ShrubberyCreationForm();
 
-	std::string	getTarget(void) const;
+	std::string		getTarget(void) const;
 
-	void		beSigned(const Bureaucrat &bureaucrat);
-
-	virtual void	execute(Bureaucrat const & executor) const = 0;
-
-	class	GradeTooHighException: public std::exception {
-		public:
-			const char *what() const throw() {
-				return "Grade too high";
-			}
-	};
-	class	GradeTooLowException: public std::exception {
-		public:
-			const char *what() const throw() {
-				return "Grade too low";
-			}
-	};
-
+	void	execute(Bureaucrat const & executor) const;
 };
 
 std::ostream	&operator<<(std::ostream &stream, const AForm &model);

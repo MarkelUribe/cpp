@@ -3,6 +3,8 @@
 
 #include <iostream>
 #include <stdexcept>
+#include <iostream>
+#include <fstream>
 
 class Bureaucrat;
 
