@@ -28,7 +28,7 @@ std::string	ShrubberyCreationForm::getTarget() const {
 }
 
 void	ShrubberyCreationForm::execute(Bureaucrat const & executor) const {
-	std::ofstream	outfile((this->target + " shrubbery").c_str());
+	std::ofstream	outfile((this->target + " shr	ubbery").c_str());
 
 	if (!outfile.is_open())
 	{
