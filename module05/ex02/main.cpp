@@ -33,11 +33,11 @@ int main(void)
 		std::cout << test << std::endl;
 		std::cout << "----- Too low exceptions -----" << std::endl;
 		std::cout << john << std::endl;
-		john.incrementGrade();
+		john.decrementGrade();
 		std::cout << john << std::endl;
 		std::cout << "----- Too high exceptions -----" << std::endl;
 		std::cout << jane << std::endl;
-		jane.decrementGrade();
+		jane.incrementGrade();
 		std::cout << jane << std::endl;
 		delete shrubbery;
 		delete robotomy;
