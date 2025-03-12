@@ -18,6 +18,9 @@ private:
 	const unsigned int			signGrade;
 	const unsigned int			executeGrade;
 
+protected:
+	void	checkExec(Bureaucrat const & executor) const;
+
 public:
 	AForm();
 	AForm(std::string name, int signGrade, int executeGrade);
@@ -37,21 +40,15 @@ public:
 
 	class	GradeTooHighException: public std::exception {
 		public:
-			const char *what() const throw() {
-				return "Grade too high";
-			}
+			const char *what() const throw();
 	};
 	class	GradeTooLowException: public std::exception {
 		public:
-			const char *what() const throw() {
-				return "Grade too low";
-			}
+			const char *what() const throw();
 	};
-	class NotSignedException : public std::exception {
+	class	NotSignedException : public std::exception {
 		public:
-			const char *what() const throw() {
-				return ("Form not signed");
-			}
+			const char *what() const throw();
 	};
 };
 

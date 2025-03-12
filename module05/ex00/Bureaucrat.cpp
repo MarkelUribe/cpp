@@ -45,3 +45,11 @@ std::ostream	&operator<<(std::ostream &ostream, const Bureaucrat &model) {
 	ostream << model.getName() << ", bureaucrat grade " << model.getGrade();
 	return(ostream);
 }
+
+const char* Bureaucrat::GradeTooHighException::what() const throw() {
+	return "Grade too high";
+}
+
+const char* Bureaucrat::GradeTooLowException::what() const throw() {
+	return "Grade too low";
+}

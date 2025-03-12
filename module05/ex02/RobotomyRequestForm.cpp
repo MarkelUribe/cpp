@@ -28,14 +28,7 @@ std::string	RobotomyRequestForm::getTarget() const {
 }
 
 void	RobotomyRequestForm::execute(Bureaucrat const & executor) const {
-	if (!this->getSigned())
-	{
-		throw NotSignedException();
-	}
-	if (this->getExecuteGrade() < executor.getGrade())
-	{
-		throw GradeTooLowException();
-	}
+	this->checkExec(executor);
 	std::cout << "Making some drilling noises...\n";
 	srand(time(0));
 	if (std::rand() % 2 == 0)
