@@ -14,4 +14,13 @@ public:
 	static void	convert(std::string literal);
 };
 
+enum
+{
+	CHAR,
+	INT,
+	FLOAT,
+	DOUBLE,
+	INVALID
+};
+
 #endif
