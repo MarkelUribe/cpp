@@ -1,41 +1,13 @@
-#include "Serializer.hpp"
-
-#define HRED	"\033[91m"
-#define HBLU	"\033[94m"
-#define HGRE	"\033[92m"
-#define HMAG	"\033[95m"
-#define RST		"\033[0m"
+#include "Base.hpp"
 
 int main(void) {
-	Data		data;
-	Data		*ptr = &data;
-	uintptr_t	uptr = Serializer::serialize(&data);
+	Base* x = generate();
 
-	data.id = 1;
-	data.name = "aaaa";
-	data.writter = "me";
+	identify(x);
 
-	std::cout << HBLU;
+	identify(*x);
 
-	std::cout << data.id << std::endl;
-	std::cout << data.name << std::endl;
-	std::cout << data.writter << std::endl;
+	delete(x);
 
-	std::cout << HGRE;
-
-	std::cout << ptr->id << std::endl;
-	std::cout << ptr->name << std::endl;
-	std::cout << ptr->writter << std::endl;
-
-	ptr = Serializer::deserialize(uptr);
-
-	std::cout << HMAG;
-
-	std::cout << ptr->id << std::endl;
-	std::cout << ptr->name << std::endl;
-	std::cout << ptr->writter << std::endl;
-
-	std::cout << RST;
-
-	return 0;
+	return (0);
 }
