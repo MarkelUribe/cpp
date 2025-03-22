@@ -14,14 +14,14 @@ class Array
 		Array();
 		Array(unsigned int n);
 		Array(const Array &copy);
-		Array &operator= (const Array &other);
+		Array &operator= (const Array &model);
 		~Array();
 
 		unsigned int	size() const;
 		T&				operator [] (unsigned int n);
 		const T&		operator [] (unsigned int n) const;
-		Array&			operator = (const Array& other);
 };
 
+#include "Array.tpp"
 
 #endif
