@@ -6,7 +6,7 @@
 #include <iostream>
 
 template <typename T>
-bool	easyfind(const T& cont, int n);
+bool	easyfind(T& cont, int n);
 
 #include "easyfind.tpp"
 

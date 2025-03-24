@@ -1,9 +1,11 @@
 #include "easyfind.hpp"
 
 template <typename T>
-bool	easyfind(const T& cont, int n) {
-	vector<T>::iterator it;
+bool	easyfind(T& cont, int n) {
+	typename T::iterator it;
 
+
+	//it = std::find(cont.begin(), cont.end(), n);
 	for (it = cont.begin(); it != cont.end(); ++it) {
 		if (*it == n)
 			return true;
