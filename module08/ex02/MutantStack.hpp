@@ -15,10 +15,11 @@ public:
 	MutantStack &operator= (const MutantStack &model);
 	~MutantStack();
 
-	void			addNumber(int nbr);
-	unsigned int	shortestSpan();
-	unsigned int	longestSpan();
-	
+	typedef typename std::deque<T>::iterator	iterator;
+	iterator begin();
+	iterator end();
 };
+
+#include "MutantStack.tpp"
 
 #endif

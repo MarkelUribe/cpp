@@ -1,27 +1,26 @@
-#include "Span.hpp"
+#include "MutantStack.hpp"
 
-int main(void)
+int main()
 {
-	try
+	MutantStack<int> mstack;
+	mstack.push(5);
+	mstack.push(17);
+	std::cout << mstack.top() << std::endl;
+	mstack.pop();
+	std::cout << mstack.size() << std::endl;
+	mstack.push(3);
+	mstack.push(5);
+	mstack.push(737);
+	mstack.push(0);
+	MutantStack<int>::iterator it = mstack.begin();
+	MutantStack<int>::iterator ite = mstack.end();
+	++it;
+	--it;
+	while (it != ite)
 	{
-		Span	s = Span(10000);
-		int		n;
-
-		srand(time(NULL));
-		for (int i = 0; i < 10000; i++)
-		{
-			n = rand() % 100000;
-			std::cout << n << ", ";
-			s.addNumber(n);
-		}
-		
-		std::cout << std::endl;
-
-		std::cout << "shortest span: " << s.shortestSpan() << std::endl;
-		std::cout << "longest span: " << s.longestSpan() << std::endl;
+		std::cout << *it << std::endl;
+		++it;
 	}
-	catch (const std::exception &e)
-	{
-		std::cerr << e.what() << '\n';
-	}
+	std::stack<int> s(mstack);
+	return 0;
 }
