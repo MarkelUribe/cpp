@@ -3,7 +3,7 @@
 BitcoinExchange::BitcoinExchange() {}
 BitcoinExchange::BitcoinExchange(std::string file)
 {
-	std::ifstream fin(file);
+	std::ifstream fin(file.c_str());
 	if (!fin)
 		throw std::runtime_error("Error: could not open the data.csv file.");
 	std::string date;
@@ -26,28 +26,28 @@ BitcoinExchange &BitcoinExchange::operator=(const BitcoinExchange &model)
 
 BitcoinExchange::~BitcoinExchange() {}
 
-static int parse_date(std::string dateString)
+static int parse_date(const std::string &dateString)
 {
-	if (dateString.size() != 10)
-		return (std::cout << "Invalid date" << std::endl, 0);
+	if (dateString.size() != 10 || dateString[4] != '-' || dateString[7] != '-')
+	{
+		std::cout << "Invalid date format" << std::endl;
+		return 0;
+	}
 
-	// Initialize a tm structure to hold the parsed date
-	std::tm tm = {};
-
-	// Create a string stream to parse the date string
+	int year, month, day;
 	std::istringstream ss(dateString);
 
-	// Parse the date string using std::get_time
-	ss >> std::get_time(&tm, "%Y-%m-%d");
+	ss >> year;
+	ss.ignore();
+	ss >> month;
+	ss.ignore();
+	ss >> day;
 
-	// Check if parsing was successful
-	if (ss.fail())
-		return (std::cout << "Invalid date" << std::endl, 0);
-
-	// Convert the parsed date to a time_t value
-	std::time_t date = mktime(&tm);
-	if (date == -1)
-		return (std::cout << "Invalid date" << std::endl, 0);
+	if (ss.fail() || month < 1 || month > 12 || day < 1 || day > 31)
+	{
+		std::cout << "Invalid date values" << std::endl;
+		return 0;
+	}
 
 	return 1;
 }
@@ -62,22 +62,21 @@ static int splitLine(const std::string &line, std::string &date, std::string &va
 		val = line.substr(pos + 3);
 	}
 	else
-	{
-		std::cout << "Invalid line: " << line << std::endl;
-	}
+		return (std::cout << "Invalid line: " << line << std::endl, 0);
+	return 1;
 }
 
+static bool isValidPositiveFloat(const std::string &valueString)
+{
+	std::istringstream ss(valueString);
+	float value;
 
-static bool isValidPositiveFloat(const std::string& valueString) {
-    std::istringstream ss(valueString);
-    float value;
+	ss >> std::noskipws >> value;
 
-    ss >> std::noskipws >> value;
-
-    // Check if parsing succeeded, no extra characters remain, and the number is positive
-    bool ret = !ss.fail() && ss.eof() && value >= 0;
+	// Check if parsing succeeded, no extra characters remain, and the number is positive
+	bool ret = !ss.fail() && ss.eof() && value >= 0;
 	if (!ret)
-		std::cout << "Invalid value: " << std::endl;
+		std::cout << "Invalid float value" << std::endl;
 	return ret;
 }
 
@@ -93,6 +92,21 @@ void BitcoinExchange::printValue(std::ifstream &file)
 
 		if (!splitLine(line, date, val) && !parse_date(date) && !isValidPositiveFloat(val))
 			continue;
-		
+
+		// Find exact date or closest lower one
+		std::map<std::string, float>::iterator it = _map.lower_bound(date);
+
+		if (it == _map.end() || it->first != date) // If exact date not found
+		{
+			if (it == _map.begin()) // No lower value exists
+			{
+				std::cout << "No valid lower date found for: " << date << std::endl;
+				continue;
+			}
+			--it; // Move to the closest lower date
+		}
+
+		// Print the found value
+		std::cout << "Date: " << date << " -> Value: " << val << std::endl;
 	}
 }
