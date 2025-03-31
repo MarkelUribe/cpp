@@ -8,6 +8,7 @@
 #include <map>
 #include <fstream>
 #include <ctime>
+#include <limits>
 
 class BitcoinExchange
 {

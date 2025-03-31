@@ -3,16 +3,18 @@
 BitcoinExchange::BitcoinExchange() {}
 BitcoinExchange::BitcoinExchange(std::string file)
 {
-	std::ifstream fin(file.c_str());
-	if (!fin)
-		throw std::runtime_error("Error: could not open the data.csv file.");
+	std::ifstream infile(file.c_str());
+
+	if (!infile)
+		throw std::runtime_error("Error: could not open file.");
+
 	std::string date;
-	float value;
-	while (fin >> date >> value)
-	{
-		_map[date] = value;
-	}
-	fin.close();
+	std::string num;
+
+	std::getline(infile, num);
+
+	while (std::getline(infile, date, ',') && std::getline(infile, num))
+		_map.insert(std::make_pair(date, std::strtof(num.c_str(), NULL)));
 }
 
 BitcoinExchange::BitcoinExchange(const BitcoinExchange &copy) : _map(copy._map) {}
@@ -31,10 +33,7 @@ static int parse_date(const std::string &dateString)
 	const int daysInMonth[13] = {0, 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31};
 
 	if (dateString.size() != 10 || dateString[4] != '-' || dateString[7] != '-')
-	{
-		std::cout << "Invalid date format" << std::endl;
-		return 0;
-	}
+		return (std::cerr << "Error: Invalid date format" << std::endl, 0);
 
 	int year, month, day;
 	std::istringstream ss(dateString);
@@ -45,12 +44,8 @@ static int parse_date(const std::string &dateString)
 	ss.ignore();
 	ss >> day;
 
-	if (ss.fail() || month < 1 || month > 12 || day != daysInMonth[month])
-	{
-		std::cout << "Invalid date values" << std::endl;
-		return 0;
-	}
-
+	if (ss.fail() || month < 1 || month > 12 || day < 1 || day > daysInMonth[month])
+		return (std::cerr << "Error: Invalid date values" << std::endl, 0);
 	return 1;
 }
 
@@ -64,7 +59,7 @@ static int splitLine(const std::string &line, std::string &date, std::string &va
 		val = line.substr(pos + 3);
 	}
 	else
-		return (std::cout << "Invalid line: " << line << std::endl, 0);
+		return (std::cerr << "Error: bad input => " << line << std::endl, 0);
 	return 1;
 }
 
@@ -76,9 +71,9 @@ static bool isValidPositiveFloat(const std::string &valueString)
 	ss >> std::noskipws >> value;
 
 	// Check if parsing succeeded, no extra characters remain, and the number is positive
-	bool ret = !ss.fail() && ss.eof() && value >= 0;
+	bool ret = !ss.fail() && ss.eof() && value >= 0 && value <= 1000;
 	if (!ret)
-		std::cout << "Invalid float value" << std::endl;
+		std::cerr << "Error: Invalid float value" << std::endl;
 	return ret;
 }
 
@@ -92,23 +87,27 @@ void BitcoinExchange::printValue(std::ifstream &file)
 		if (line.empty())
 			continue;
 
-		if (!splitLine(line, date, val) && !parse_date(date) && !isValidPositiveFloat(val))
+		if (!(splitLine(line, date, val) && parse_date(date) && isValidPositiveFloat(val)))
 			continue;
 
-		// Find exact date or closest lower one
+		// Find the first element not less than the date
 		std::map<std::string, float>::iterator it = _map.lower_bound(date);
 
-		if (it == _map.end() || it->first != date) // If exact date not found
-		{
-			if (it == _map.begin()) // No lower value exists
-			{
-				std::cout << "No valid lower date found for: " << date << std::endl;
-				continue;
-			}
-			--it; // Move to the closest lower date
-		}
+		float rate = 0.0f;
 
-		// Print the found value
-		std::cout << "Date: " << date << " -> Value: " << val << std::endl;
+		if (it != _map.end() && it->first == date)
+			rate = it->second;
+		else
+		{
+			// No exact match, find previous date
+			if (it != _map.begin())
+			{
+				--it; // Move to previous date (the closest lower one)
+				rate = it->second;
+			}
+			else
+				continue;
+		}
+		std::cout << date << " => " << val << " = " << atof(val.c_str()) * rate << std::endl;
 	}
 }

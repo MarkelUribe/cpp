@@ -4,11 +4,11 @@ static int	parse(int argc, std::ifstream &fin) {
 	std::string		line;
 
 	if (argc != 2)
-		return (std::cout << "Enter one file as the argument!" << std::endl, 0);
+		return (std::cerr << "Enter one file as the argument!" << std::endl, 0);
 	if (!fin)
-		return(std::cout << "Error, could not open file." << std::endl, 0);
+		return(std::cerr << "Error, could not open file." << std::endl, 0);
 	if (std::getline(fin, line, '\n') && line != "date | value")
-		return(std::cout << "Error, infile has the wrong format" << std::endl, 0);
+		return(std::cerr << "Error, infile has the wrong format" << std::endl, 0);
 	return 1;
 }
 
