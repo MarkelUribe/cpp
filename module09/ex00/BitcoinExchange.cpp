@@ -28,6 +28,8 @@ BitcoinExchange::~BitcoinExchange() {}
 
 static int parse_date(const std::string &dateString)
 {
+	const int daysInMonth[13] = {0, 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31};
+
 	if (dateString.size() != 10 || dateString[4] != '-' || dateString[7] != '-')
 	{
 		std::cout << "Invalid date format" << std::endl;
@@ -43,7 +45,7 @@ static int parse_date(const std::string &dateString)
 	ss.ignore();
 	ss >> day;
 
-	if (ss.fail() || month < 1 || month > 12 || day < 1 || day > 31)
+	if (ss.fail() || month < 1 || month > 12 || day != daysInMonth[month])
 	{
 		std::cout << "Invalid date values" << std::endl;
 		return 0;
