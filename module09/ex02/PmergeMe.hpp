@@ -5,11 +5,14 @@
 #include <list>
 #include <cmath>
 
+#define BESUGO 
+
 class PmergeMe
 {
 private:
 	std::list<std::list<int> > elements;
 	int	level;
+	static const unsigned int besugo[];
 
 public:
 	PmergeMe();
@@ -18,10 +21,12 @@ public:
 	PmergeMe&	operator = (const PmergeMe& other);
 	~PmergeMe();
 
-	void	addElem(std::list<int> n);
-	void	sort(int argc, char **argv);
-	void	merge();
-	void	printElemets();
+	void		addElem(std::list<int> n);
+	void		sort(int argc, char **argv);
+	void		merge();
+	void		insert();
+	void		copyValues(PmergeMe &tmp);
+	void		printElemets();
 };
 
 #endif

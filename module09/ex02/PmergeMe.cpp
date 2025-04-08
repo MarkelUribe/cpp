@@ -1,6 +1,6 @@
 #include "PmergeMe.hpp"
 
-PmergeMe::PmergeMe() { level = 0; }
+PmergeMe::PmergeMe() { level = 1; }
 PmergeMe::PmergeMe(int level) { this->level = level; }
 PmergeMe::PmergeMe(const PmergeMe &other) : elements(other.elements), level(other.level) {}
 PmergeMe &PmergeMe::operator=(const PmergeMe &other)
@@ -11,6 +11,19 @@ PmergeMe &PmergeMe::operator=(const PmergeMe &other)
 }
 PmergeMe::~PmergeMe() {}
 
+const unsigned int PmergeMe::besugo[] = {3, 5, 11, 21, 43, 85, 171, 341,
+										 683, 1365, 2731, 5461, 10923, 21845, 43691, 87381, 174763, 349525};
+
+bool isNum(const std::string &s)
+{
+	if (s.empty())
+		return false;
+	for (size_t i = 0; i < s.size(); i++)
+		if (!isdigit(s[i]))
+			return false;
+	return true;
+}
+
 void PmergeMe::addElem(std::list<int> n)
 {
 	unsigned int pairSize = (int)pow(2, level);
@@ -18,7 +31,7 @@ void PmergeMe::addElem(std::list<int> n)
 	if (elements.empty())
 	{
 		elements.push_back(n);
-		return ;
+		return;
 	}
 	if (elements.back().size() < pairSize)
 	{
@@ -31,30 +44,64 @@ void PmergeMe::addElem(std::list<int> n)
 	elements.push_back(n);
 }
 
-bool isNum(const std::string &s)
+void PmergeMe::copyValues(PmergeMe &tmp)
 {
-	if (s.empty())
-		return false;
-	for (size_t i = 0; i < s.size(); i++)
-		if (!isdigit(s[i]))
-			return false;
-	return true;
+	// Flatten tmp.elements into a single list
+	std::list<int> tmp_flat;
+	for (std::list<std::list<int> >::iterator it = tmp.elements.begin(); it != tmp.elements.end(); ++it)
+	tmp_flat.splice(tmp_flat.end(), *it); // Move nodes instead of copying
+
+	// Rebuild original structure with new order
+	std::list<int>::iterator flat_it = tmp_flat.begin();
+	for (std::list<std::list<int> >::iterator outer_it = elements.begin();
+	outer_it != elements.end() && flat_it != tmp_flat.end();
+	++outer_it)
+	{
+		std::list<int> new_group;
+		for (size_t i = 0; i < outer_it->size() && flat_it != tmp_flat.end(); ++i)
+			new_group.splice(new_group.end(), tmp_flat, flat_it++);
+		outer_it->swap(new_group); // Replace the old group with the new one
+	}
 }
 
-void PmergeMe::merge()
+void PmergeMe::insert()
 {
-	PmergeMe tmp(level++);
+	unsigned int pairSize = (int)pow(2, level);
+	std::list<std::list<int> > pend;
+	std::list<std::list<int> >::iterator it = elements.begin();
+	std::advance(it, 2);
+
+	this->printElemets();
+	while (it != elements.end())
+	{
+		// Save next before splice, since 'it' will be invalidated
+		std::list<std::list<int> >::iterator toMove = it++;
+		if (toMove->size() == pairSize)
+		pend.splice(pend.end(), elements, toMove); // Move list from elements to pend
+	}
+	this->printElemets();
+
+}
+
+void	PmergeMe::merge()
+{
+	PmergeMe tmp(level + 1);
 	unsigned int pairSize = (int)pow(2, level);
 	std::list<std::list<int> >::iterator it;
+
 	for (it = elements.begin(); it != elements.end(); it++)
 		if (it->size() == pairSize)
-			tmp.addElem(std::list<int>(*it));
+			tmp.addElem(*it);
 	if (tmp.elements.size() > 2)
 		tmp.merge();
 	else if (tmp.elements.size() == 2)
 		if (tmp.elements.front().size() == tmp.elements.back().size())
 			tmp.merge();
+
+	this->copyValues(tmp);
+	this->insert();
 	//this->printElemets();
+	//tmp.printElemets();
 }
 
 void PmergeMe::sort(int argc, char **argv)
@@ -67,7 +114,6 @@ void PmergeMe::sort(int argc, char **argv)
 		list.push_back(atoi(argv[i]));
 		this->addElem(list);
 	}
-	this->printElemets();
 	this->merge();
 }
 
