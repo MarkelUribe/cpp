@@ -1,6 +1,6 @@
 #include "PmergeMe.hpp"
 
-PmergeMe::PmergeMe() { level = 1; }
+PmergeMe::PmergeMe() { level = 0; }
 PmergeMe::PmergeMe(int level) { this->level = level; }
 PmergeMe::PmergeMe(const PmergeMe &other) : elements(other.elements), level(other.level) {}
 PmergeMe &PmergeMe::operator=(const PmergeMe &other)
@@ -27,21 +27,19 @@ bool isNum(const std::string &s)
 void PmergeMe::addElem(std::list<int> n)
 {
 	unsigned int pairSize = (int)pow(2, level);
+	if (pairSize == 0)
+		pairSize = 1;
 
-	if (elements.empty())
+	if (elements.empty() || elements.back().size() >= pairSize)
 	{
 		elements.push_back(n);
 		return;
 	}
-	if (elements.back().size() < pairSize)
-	{
-		if (elements.back().back() < n.back())
-			elements.back().splice(elements.back().end(), n);
-		else
-			elements.back().splice(elements.back().begin(), n);
-		return;
-	}
-	elements.push_back(n);
+	if (elements.back().back() < n.back())
+		elements.back().splice(elements.back().end(), n);
+	else
+		elements.back().splice(elements.back().begin(), n);
+
 }
 
 void PmergeMe::copyValues(PmergeMe &tmp)
@@ -49,13 +47,13 @@ void PmergeMe::copyValues(PmergeMe &tmp)
 	// Flatten tmp.elements into a single list
 	std::list<int> tmp_flat;
 	for (std::list<std::list<int> >::iterator it = tmp.elements.begin(); it != tmp.elements.end(); ++it)
-	tmp_flat.splice(tmp_flat.end(), *it); // Move nodes instead of copying
+		tmp_flat.splice(tmp_flat.end(), *it); // Move nodes instead of copying
 
 	// Rebuild original structure with new order
 	std::list<int>::iterator flat_it = tmp_flat.begin();
 	for (std::list<std::list<int> >::iterator outer_it = elements.begin();
-	outer_it != elements.end() && flat_it != tmp_flat.end();
-	++outer_it)
+		 outer_it != elements.end() && flat_it != tmp_flat.end();
+		 ++outer_it)
 	{
 		std::list<int> new_group;
 		for (size_t i = 0; i < outer_it->size() && flat_it != tmp_flat.end(); ++i)
@@ -64,26 +62,77 @@ void PmergeMe::copyValues(PmergeMe &tmp)
 	}
 }
 
+
+void PmergeMe::insertElem(std::list<std::list<int> > &pend, std::list<std::list<int> >::iterator &pend_it)
+{
+	int key = pend_it->back(); // Use the last value as the key for ordering
+	//std::cout << pend.size() << std::endl;
+    // Find the correct position in elements to insert this group
+    std::list<std::list<int> >::iterator insert_pos = elements.begin();
+    while (insert_pos != elements.end() && insert_pos->back() < key)
+        ++insert_pos;
+
+    // Splice the group into the right spot in elements
+    elements.splice(insert_pos, pend, pend_it);
+}
+
 void PmergeMe::insert()
 {
 	unsigned int pairSize = (int)pow(2, level);
+	if (pairSize == 0)
+		pairSize = 1;
+		
 	std::list<std::list<int> > pend;
 	std::list<std::list<int> >::iterator it = elements.begin();
 	std::advance(it, 2);
-
-	this->printElemets();
-	while (it != elements.end())
+	for (int i = 1; it != elements.end(); i++)
 	{
 		// Save next before splice, since 'it' will be invalidated
 		std::list<std::list<int> >::iterator toMove = it++;
-		if (toMove->size() == pairSize)
-		pend.splice(pend.end(), elements, toMove); // Move list from elements to pend
+		if (toMove->size() == pairSize && i%2)
+			pend.splice(pend.end(), elements, toMove); // Move list from elements to pend
 	}
-	this->printElemets();
+	size_t besugo_len = sizeof(besugo) / sizeof(unsigned int);
+	for (size_t i = 1; i < besugo_len && !pend.empty(); ++i)
+	{
+		unsigned int count = besugo[i] - besugo[i - 1];
 
+		if (count >= pend.size())
+    		count = pend.size(); // Clamp to size
+		if (count == 0)
+			continue;
+		std::list<std::list<std::list<int> >::iterator> targets;
+
+		it = pend.begin();
+		for (unsigned int j = 0; j < count && it != pend.end(); ++j, ++it)
+			targets.push_back(it);
+		
+		// Now insert in reverse order using only the targets list
+		while (!targets.empty())
+		{
+			std::list<std::list<std::list<int> >::iterator>::reverse_iterator rit = targets.rbegin();
+			insertElem(pend, *rit);
+			targets.pop_back(); // removes from the back safely
+		}
+	}
+
+/* 	while (!pend.empty())
+	{
+		std::list<std::list<int> >::iterator pend_it = pend.begin();
+		int key = pend_it->back();
+
+		std::cout << "wtf" <<std::endl;
+		std::list<std::list<int> >::iterator insert_pos = elements.begin();
+		while (insert_pos != elements.end() && insert_pos->back() < key)
+			++insert_pos;
+
+		elements.splice(insert_pos, pend, pend_it);
+	} */
+
+	//printElemets(elements);
 }
 
-void	PmergeMe::merge()
+void PmergeMe::merge()
 {
 	PmergeMe tmp(level + 1);
 	unsigned int pairSize = (int)pow(2, level);
@@ -101,7 +150,7 @@ void	PmergeMe::merge()
 	this->copyValues(tmp);
 	this->insert();
 	//this->printElemets();
-	//tmp.printElemets();
+	// tmp.printElemets();
 }
 
 void PmergeMe::sort(int argc, char **argv)
@@ -115,9 +164,10 @@ void PmergeMe::sort(int argc, char **argv)
 		this->addElem(list);
 	}
 	this->merge();
+	printElemets(elements);
 }
 
-void PmergeMe::printElemets()
+void printElemets(std::list<std::list<int> > elements)
 {
 	if (elements.empty())
 	{

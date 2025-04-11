@@ -25,8 +25,9 @@ public:
 	void		sort(int argc, char **argv);
 	void		merge();
 	void		insert();
+	void		insertElem(std::list<std::list<int> > &pend, std::list<std::list<int> >::iterator &pend_it);
 	void		copyValues(PmergeMe &tmp);
-	void		printElemets();
 };
+void	printElemets(std::list<std::list<int> > elements);
 
 #endif
