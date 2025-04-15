@@ -42,7 +42,24 @@ void PmergeMe::addElem(std::list<int> n)
 
 }
 
-void PmergeMe::copyValues(PmergeMe &tmp)
+void	PmergeMe::addElem(std::vector<int> n)
+{
+	unsigned int pairSize = (int)pow(2, level);
+	if (pairSize == 0)
+		pairSize = 1;
+
+	if (vec_elements.empty() || vec_elements.back().size() >= pairSize)
+	{
+		vec_elements.push_back(n);
+		return;
+	}
+	if (vec_elements.back().back() < n.back())
+		vec_elements.back().insert(vec_elements.back().end(), n.begin(), n.end());
+	else
+		vec_elements.back().insert(vec_elements.back().begin(), n.begin(), n.end());
+}
+
+void	PmergeMe::copyValues(PmergeMe &tmp)
 {
 	// Flatten tmp.elements into a single list
 	std::list<int> tmp_flat;
@@ -62,18 +79,53 @@ void PmergeMe::copyValues(PmergeMe &tmp)
 	}
 }
 
+void	PmergeMe::vec_copyValues(PmergeMe &tmp)
+{
+	// Flatten tmp.elements into a single list
+	std::vector<int> tmp_flat;
+	for (std::vector<std::vector<int> >::iterator it = tmp.vec_elements.begin(); it != tmp.vec_elements.end(); ++it)
+		tmp_flat.insert(tmp_flat.end(), it->begin(), it->end()); // Move nodes instead of copying
 
-void PmergeMe::insertElem(std::list<std::list<int> > &pend, std::list<std::list<int> >::iterator &pend_it)
+	// Rebuild original structure with new order
+	std::vector<int>::iterator flat_it = tmp_flat.begin();
+	for (std::vector<std::vector<int> >::iterator outer_it = vec_elements.begin();
+		 outer_it != vec_elements.end() && flat_it != tmp_flat.end();
+		 ++outer_it)
+	{
+		std::vector<int> new_group;
+		for (size_t i = 0; i < outer_it->size() && flat_it != tmp_flat.end(); ++i)
+			new_group.push_back(*flat_it);
+		*outer_it = new_group;
+	}
+}
+
+void	PmergeMe::insertElem(std::list<std::list<int> > &pend, std::list<std::list<int> >::iterator &pend_it)
 {
 	int key = pend_it->back(); // Use the last value as the key for ordering
 	//std::cout << pend.size() << std::endl;
-    // Find the correct position in elements to insert this group
-    std::list<std::list<int> >::iterator insert_pos = elements.begin();
-    while (insert_pos != elements.end() && insert_pos->back() < key)
-        ++insert_pos;
+	// Find the correct position in elements to insert this group
+	std::list<std::list<int> >::iterator insert_pos = elements.begin();
+	while (insert_pos != elements.end() && insert_pos->back() < key)
+		++insert_pos;
 
-    // Splice the group into the right spot in elements
-    elements.splice(insert_pos, pend, pend_it);
+	// Splice the group into the right spot in elements
+	elements.splice(insert_pos, pend, pend_it);
+}
+
+void	PmergeMe::insertElem(std::vector<std::vector<int> > &pend, std::vector<std::vector<int> >::iterator &pend_it)
+{
+	int key = pend_it->back(); // Use the last value as the key for ordering
+
+	// Find the correct position in elements to insert this group
+	std::vector<std::vector<int> >::iterator insert_pos = vec_elements.begin();
+	while (insert_pos != vec_elements.end() && insert_pos->back() < key)
+		++insert_pos;
+
+	vec_elements.insert(insert_pos, *pend_it);
+	// Erase the original from pend
+	pend.erase(pend_it);
+	// Reset pend_it to the beginning for the caller (optional or caller handles it)
+	pend_it = pend.begin();
 }
 
 void PmergeMe::insert()
@@ -98,7 +150,7 @@ void PmergeMe::insert()
 		unsigned int count = besugo[i] - besugo[i - 1];
 
 		if (count >= pend.size())
-    		count = pend.size(); // Clamp to size
+			count = pend.size(); // Clamp to size
 		if (count == 0)
 			continue;
 		std::list<std::list<std::list<int> >::iterator> targets;
@@ -108,28 +160,56 @@ void PmergeMe::insert()
 			targets.push_back(it);
 		
 		// Now insert in reverse order using only the targets list
+		std::list<std::list<std::list<int> >::iterator>::reverse_iterator rit;
 		while (!targets.empty())
 		{
-			std::list<std::list<std::list<int> >::iterator>::reverse_iterator rit = targets.rbegin();
+			rit = targets.rbegin();
 			insertElem(pend, *rit);
 			targets.pop_back(); // removes from the back safely
 		}
 	}
+}
 
-/* 	while (!pend.empty())
+void PmergeMe::vec_insert()
+{
+	unsigned int pairSize = (int)pow(2, level);
+	if (pairSize == 0)
+		pairSize = 1;
+		
+	std::vector<std::vector<int> > pend;
+	std::vector<std::vector<int> >::iterator it = vec_elements.begin();
+	std::advance(it, 2);
+	for (int i = 1; it != elements.end(); i++)
 	{
-		std::list<std::list<int> >::iterator pend_it = pend.begin();
-		int key = pend_it->back();
+		// Save next before splice, since 'it' will be invalidated
+		std::list<std::list<int> >::iterator toMove = it++;
+		if (toMove->size() == pairSize && i%2)
+			pend.splice(pend.end(), elements, toMove); // Move list from elements to pend
+	}
+	size_t besugo_len = sizeof(besugo) / sizeof(unsigned int);
+	for (size_t i = 1; i < besugo_len && !pend.empty(); ++i)
+	{
+		unsigned int count = besugo[i] - besugo[i - 1];
 
-		std::cout << "wtf" <<std::endl;
-		std::list<std::list<int> >::iterator insert_pos = elements.begin();
-		while (insert_pos != elements.end() && insert_pos->back() < key)
-			++insert_pos;
+		if (count >= pend.size())
+			count = pend.size(); // Clamp to size
+		if (count == 0)
+			continue;
+		std::list<std::list<std::list<int> >::iterator> targets;
 
-		elements.splice(insert_pos, pend, pend_it);
-	} */
-
-	//printElemets(elements);
+		it = pend.begin();
+		for (unsigned int j = 0; j < count && it != pend.end(); ++j, ++it)
+			targets.push_back(it);
+		
+		// Now insert in reverse order using only the targets list
+		std::list<std::list<std::list<int> >::iterator>::reverse_iterator rit;
+		while (!targets.empty())
+		{
+			rit = targets.rbegin();
+			insertElem(pend, *rit);
+			targets.pop_back(); // removes from the back safely
+		}
+	}
 }
 
 void PmergeMe::merge()
@@ -153,18 +233,59 @@ void PmergeMe::merge()
 	// tmp.printElemets();
 }
 
+void PmergeMe::vec_merge()
+{
+	PmergeMe tmp(level + 1);
+	unsigned int pairSize = (int)pow(2, level);
+	std::vector<std::vector<int> >::iterator it;
+
+	for (it = vec_elements.begin(); it != vec_elements.end(); it++)
+		if (it->size() == pairSize)
+			tmp.addElem(*it);
+	if (tmp.vec_elements.size() > 2)
+		tmp.vec_merge();
+	else if (tmp.vec_elements.size() == 2)
+		if (tmp.vec_elements.front().size() == tmp.vec_elements.back().size())
+			tmp.vec_merge();
+
+	this->vec_copyValues(tmp);
+	this->vec_insert();
+	//this->printElemets();
+	// tmp.printElemets();
+}
+
 void PmergeMe::sort(int argc, char **argv)
 {
+	std::clock_t start, end;
+	std::list<int> list;
+	std::vector<int> vector;
 	for (int i = 1; i < argc; i++)
 	{
 		if (!isNum(argv[i]))
 			throw std::runtime_error("Only insert positive integers!");
-		std::list<int> list;
 		list.push_back(atoi(argv[i]));
+		vector.push_back(atoi(argv[i]));
 		this->addElem(list);
+		this->addElem(vector);
 	}
-	this->merge();
+	std::cout << "Before: ";
 	printElemets(elements);
+
+	//list sort
+	start = std::clock();
+	this->merge();
+	end = std::clock();
+	double list_duration = static_cast<double>(end - start) / CLOCKS_PER_SEC * 1000.0;
+	std::cout << "After: ";
+	printElemets(elements);
+	std::cout << "Time to procress a range of " << elements.size() << " elements with std::list : " << list_duration << " miliseconds" << std::endl;
+
+	//vector sort
+	start = std::clock();
+	this->vec_merge();
+	end = std::clock();
+	double duration = static_cast<double>(end - start) / CLOCKS_PER_SEC * 1000.0;
+	std::cout << "Time to procress a range of " << elements.size() << " elements with std::vector : " << duration << " miliseconds" << std::endl;
 }
 
 void printElemets(std::list<std::list<int> > elements)
