@@ -175,16 +175,17 @@ void PmergeMe::vec_insert()
 	unsigned int pairSize = (int)pow(2, level);
 	if (pairSize == 0)
 		pairSize = 1;
-		
+
 	std::vector<std::vector<int> > pend;
-	std::vector<std::vector<int> >::iterator it = vec_elements.begin();
-	std::advance(it, 2);
-	for (int i = 1; it != elements.end(); i++)
+	for (size_t i = 2; i < vec_elements.size(); )
 	{
-		// Save next before splice, since 'it' will be invalidated
-		std::list<std::list<int> >::iterator toMove = it++;
-		if (toMove->size() == pairSize && i%2)
-			pend.splice(pend.end(), elements, toMove); // Move list from elements to pend
+		if (vec_elements[i].size() == pairSize && (i % 2 == 1))
+		{
+			pend.push_back(vec_elements[i]);
+			vec_elements.erase(vec_elements.begin() + i);
+		}
+		else
+			++i;
 	}
 	size_t besugo_len = sizeof(besugo) / sizeof(unsigned int);
 	for (size_t i = 1; i < besugo_len && !pend.empty(); ++i)
@@ -195,19 +196,12 @@ void PmergeMe::vec_insert()
 			count = pend.size(); // Clamp to size
 		if (count == 0)
 			continue;
-		std::list<std::list<std::list<int> >::iterator> targets;
 
-		it = pend.begin();
-		for (unsigned int j = 0; j < count && it != pend.end(); ++j, ++it)
-			targets.push_back(it);
-		
-		// Now insert in reverse order using only the targets list
-		std::list<std::list<std::list<int> >::iterator>::reverse_iterator rit;
-		while (!targets.empty())
+		// Process in reverse order using index (no invalidation)
+		for (int j = count - 1; j >= 0; --j)
 		{
-			rit = targets.rbegin();
-			insertElem(pend, *rit);
-			targets.pop_back(); // removes from the back safely
+			std::vector<std::vector<int> >::iterator pend_it = pend.begin() + j;
+			insertElem(pend, pend_it);
 		}
 	}
 }
@@ -226,11 +220,8 @@ void PmergeMe::merge()
 	else if (tmp.elements.size() == 2)
 		if (tmp.elements.front().size() == tmp.elements.back().size())
 			tmp.merge();
-
 	this->copyValues(tmp);
 	this->insert();
-	//this->printElemets();
-	// tmp.printElemets();
 }
 
 void PmergeMe::vec_merge()
@@ -257,35 +248,39 @@ void PmergeMe::vec_merge()
 void PmergeMe::sort(int argc, char **argv)
 {
 	std::clock_t start, end;
-	std::list<int> list;
-	std::vector<int> vector;
 	for (int i = 1; i < argc; i++)
 	{
 		if (!isNum(argv[i]))
 			throw std::runtime_error("Only insert positive integers!");
+		std::list<int> list;
+		std::vector<int> vector;
 		list.push_back(atoi(argv[i]));
 		vector.push_back(atoi(argv[i]));
 		this->addElem(list);
 		this->addElem(vector);
 	}
+
 	std::cout << "Before: ";
 	printElemets(elements);
-
 	//list sort
 	start = std::clock();
 	this->merge();
+	level = 0;
 	end = std::clock();
 	double list_duration = static_cast<double>(end - start) / CLOCKS_PER_SEC * 1000.0;
 	std::cout << "After: ";
 	printElemets(elements);
-	std::cout << "Time to procress a range of " << elements.size() << " elements with std::list : " << list_duration << " miliseconds" << std::endl;
+	std::cout << "Time to procress a range of " << elements.size()
+		<< " elements with std::list : " << list_duration << " miliseconds" << std::endl;
 
 	//vector sort
 	start = std::clock();
 	this->vec_merge();
+	printElemets(vec_elements);
 	end = std::clock();
 	double duration = static_cast<double>(end - start) / CLOCKS_PER_SEC * 1000.0;
-	std::cout << "Time to procress a range of " << elements.size() << " elements with std::vector : " << duration << " miliseconds" << std::endl;
+	std::cout << "Time to procress a range of " << elements.size() <<
+		" elements with std::vector : " << duration << " miliseconds" << std::endl;
 }
 
 void printElemets(std::list<std::list<int> > elements)
@@ -300,6 +295,30 @@ void printElemets(std::list<std::list<int> > elements)
 	{
 		std::cout << "[";
 		std::list<int>::const_iterator inner_it = outer_it->begin();
+		if (inner_it != outer_it->end())
+		{
+			std::cout << *inner_it;
+			++inner_it;
+			for (; inner_it != outer_it->end(); ++inner_it)
+				std::cout << ", " << *inner_it;
+		}
+		std::cout << "] ";
+	}
+	std::cout << std::endl;
+}
+
+void printElemets(std::vector<std::vector<int> > elements)
+{
+	if (elements.empty())
+	{
+		std::cout << "[]" << std::endl;
+		return;
+	}
+	std::vector<std::vector<int> >::const_iterator outer_it;
+	for (outer_it = elements.begin(); outer_it != elements.end(); ++outer_it)
+	{
+		std::cout << "[";
+		std::vector<int>::const_iterator inner_it = outer_it->begin();
 		if (inner_it != outer_it->end())
 		{
 			std::cout << *inner_it;
