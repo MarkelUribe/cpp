@@ -93,7 +93,7 @@ void	PmergeMe::vec_copyValues(PmergeMe &tmp)
 		 ++outer_it)
 	{
 		std::vector<int> new_group;
-		for (size_t i = 0; i < outer_it->size() && flat_it != tmp_flat.end(); ++i)
+		for (size_t i = 0; i < outer_it->size() && flat_it != tmp_flat.end(); ++i, ++flat_it)
 			new_group.push_back(*flat_it);
 		*outer_it = new_group;
 	}
@@ -251,7 +251,9 @@ void PmergeMe::sort(int argc, char **argv)
 	for (int i = 1; i < argc; i++)
 	{
 		if (!isNum(argv[i]))
-			throw std::runtime_error("Only insert positive integers!");
+			throw std::runtime_error("Error: Only insert positive integers!");
+		else if (atof(argv[i]) > INT_MAX)
+			throw std::runtime_error("Error: Don't insert numbers bigger than INT_MAX!");
 		std::list<int> list;
 		std::vector<int> vector;
 		list.push_back(atoi(argv[i]));
@@ -260,7 +262,7 @@ void PmergeMe::sort(int argc, char **argv)
 		this->addElem(vector);
 	}
 
-	std::cout << "Before: ";
+	std::cout << "Before:\t\t";
 	printElemets(elements);
 	//list sort
 	start = std::clock();
@@ -268,19 +270,18 @@ void PmergeMe::sort(int argc, char **argv)
 	level = 0;
 	end = std::clock();
 	double list_duration = static_cast<double>(end - start) / CLOCKS_PER_SEC * 1000.0;
-	std::cout << "After: ";
+	std::cout << "After:\t\t";
 	printElemets(elements);
 	std::cout << "Time to procress a range of " << elements.size()
-		<< " elements with std::list : " << list_duration << " miliseconds" << std::endl;
+		<< " elements with std::list :\t" << list_duration << " miliseconds" << std::endl;
 
 	//vector sort
 	start = std::clock();
 	this->vec_merge();
-	printElemets(vec_elements);
 	end = std::clock();
 	double duration = static_cast<double>(end - start) / CLOCKS_PER_SEC * 1000.0;
 	std::cout << "Time to procress a range of " << elements.size() <<
-		" elements with std::vector : " << duration << " miliseconds" << std::endl;
+		" elements with std::vector :\t" << duration << " miliseconds" << std::endl;
 }
 
 void printElemets(std::list<std::list<int> > elements)
@@ -293,7 +294,7 @@ void printElemets(std::list<std::list<int> > elements)
 	std::list<std::list<int> >::const_iterator outer_it;
 	for (outer_it = elements.begin(); outer_it != elements.end(); ++outer_it)
 	{
-		std::cout << "[";
+		//std::cout << "[";
 		std::list<int>::const_iterator inner_it = outer_it->begin();
 		if (inner_it != outer_it->end())
 		{
@@ -302,7 +303,7 @@ void printElemets(std::list<std::list<int> > elements)
 			for (; inner_it != outer_it->end(); ++inner_it)
 				std::cout << ", " << *inner_it;
 		}
-		std::cout << "] ";
+		std::cout << " ";
 	}
 	std::cout << std::endl;
 }
