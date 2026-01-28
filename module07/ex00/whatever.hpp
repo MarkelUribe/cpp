@@ -21,8 +21,7 @@ T    min( T &var1, T &var2) {
 	}
 	if (var1 < var2)
 		return var1;
-	else
-		return var2;
+	return var2;
 }
 
 template <typename T>
@@ -33,6 +32,5 @@ T    max( T &var1, T &var2) {
 	}
 	if (var1 > var2)
 		return var1;
-	else
-		return var2;
+	return var2;
 }
