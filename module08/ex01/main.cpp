@@ -1,16 +1,18 @@
 #include "Span.hpp"
 
+#define N 15
+
 int main(void)
 {
 	try
 	{
-		Span	s = Span(10000);
+		Span	s = Span(N);
 		int		n;
 
 		srand(time(NULL));
-		for (int i = 0; i < 10000; i++)
+		for (int i = 0; i < N; i++)
 		{
-			n = rand() % 100000;
+			n = rand() % N;
 			std::cout << n << ", ";
 			s.addNumber(n);
 		}
