@@ -105,9 +105,10 @@ void	PmergeMe::insertElem(std::list<std::list<int> > &pend, std::list<std::list<
 	//std::cout << pend.size() << std::endl;
 	// Find the correct position in elements to insert this group
 	std::list<std::list<int> >::iterator insert_pos = elements.begin();
-	while (insert_pos != elements.end() && insert_pos->back() < key)
-		++insert_pos;
+/* 	while (insert_pos != elements.end() && insert_pos->back() < key)
+		++insert_pos; */
 
+	insert_pos = std::upper_bound(elements.begin(), elements.end(), key);
 	// Splice the group into the right spot in elements
 	elements.splice(insert_pos, pend, pend_it);
 }

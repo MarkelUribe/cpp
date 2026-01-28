@@ -6,7 +6,8 @@
 # include <vector>
 # include <cmath>
 # include <ctime>
-#include <climits>
+# include <climits>
+# include <algorithm>
 
 # define BESUGO 
 

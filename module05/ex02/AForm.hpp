@@ -15,8 +15,8 @@ class AForm
 private:
 	const std::string	name;
 	bool				isSigned;
-	const unsigned int			signGrade;
-	const unsigned int			executeGrade;
+	const unsigned int	signGrade;
+	const unsigned int	executeGrade;
 
 protected:
 	void	checkExec(Bureaucrat const & executor) const;
@@ -26,8 +26,7 @@ public:
 	AForm(std::string name, int signGrade, int executeGrade);
 	AForm(const AForm &copy);
 	AForm &operator= (const AForm &other);
-	virtual 
-	~AForm();
+	virtual	~AForm();
 
 	std::string		getName(void) const;
 	bool			getSigned(void) const;
