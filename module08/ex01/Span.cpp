@@ -14,7 +14,16 @@ Span &Span::operator=(const Span &model)
 }
 Span::~Span() {};
 
-void Span::addNumber(int nbr)
+void	Span::addNumber(std::vector<int>::iterator begin, std::vector<int>::iterator end)
+{
+	while (begin != end)
+	{
+		array.push_back(*begin);
+		begin++;
+	}
+}
+
+void	Span::addNumber(int nbr)
 {
 	if (array.size() >= n)
 		throw std::runtime_error("Span is full, cannot add number.");

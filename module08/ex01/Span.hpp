@@ -22,6 +22,7 @@ public:
 	~Span();
 
 	void			addNumber(int nbr);
+	void			addNumber(std::vector<int>::iterator begin, std::vector<int>::iterator end);
 	unsigned int	shortestSpan();
 	unsigned int	longestSpan();
 	
