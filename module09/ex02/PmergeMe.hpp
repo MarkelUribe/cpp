@@ -14,9 +14,9 @@
 class PmergeMe
 {
 private:
-	std::list<std::list<int> > elements;
-	std::vector<std::vector<int> > vec_elements;
-	int	level;
+	std::list<std::list<int> > _elements;
+	std::vector<std::vector<int> > _vec_elements;
+	int	_level;
 	static const unsigned int besugo[];
 
 public:
