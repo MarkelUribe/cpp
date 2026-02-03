@@ -28,9 +28,14 @@ BitcoinExchange &BitcoinExchange::operator=(const BitcoinExchange &model)
 
 BitcoinExchange::~BitcoinExchange() {}
 
+static bool isLeap(int year)
+{
+	return ( (year % 4 == 0 && year % 100 != 0) || (year % 400 == 0) );
+}
+
 static int parse_date(const std::string &dateString)
 {
-	const int daysInMonth[13] = {0, 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31};
+	int daysInMonth[13] = {0, 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31};
 
 	if (dateString.size() != 10 || dateString[4] != '-' || dateString[7] != '-')
 		return (std::cerr << "Error: Invalid date format" << std::endl, 0);
@@ -44,8 +49,15 @@ static int parse_date(const std::string &dateString)
 	ss.ignore();
 	ss >> day;
 
-	if (ss.fail() || month < 1 || month > 12 || day < 1 || day > daysInMonth[month])
+	if (ss.fail() || month < 1 || month > 12)
 		return (std::cerr << "Error: Invalid date values" << std::endl, 0);
+
+	if (month == 2 && isLeap(year))
+		daysInMonth[2] = 29;
+
+	if (day < 1 || day > daysInMonth[month])
+		return (std::cerr << "Error: Invalid date values" << std::endl, 0);
+
 	return 1;
 }
 
@@ -108,6 +120,6 @@ void BitcoinExchange::printValue(std::ifstream &file)
 			else
 				continue;
 		}
-		std::cout << date << " => " << val << " = " << atof(val.c_str()) * rate << std::endl;
+		std::cout << date << " => " << std::fixed << std::setprecision(2) << val << " = " << atof(val.c_str()) * rate << std::endl;
 	}
 }

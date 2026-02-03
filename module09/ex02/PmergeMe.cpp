@@ -305,7 +305,7 @@ void PmergeMe::sort(int argc, char **argv)
 	double duration = static_cast<double>(end - start) / CLOCKS_PER_SEC * 1000.0;
 	std::cout << "Time to procress a range of " << _elements.size() <<
 		" elements with std::vector :\t" << duration << " miliseconds" << std::endl;
-	printElemets(_vec_elements);
+	//printElemets(_vec_elements);
 }
 
 void printElemets(std::list<std::list<int> > elements)
